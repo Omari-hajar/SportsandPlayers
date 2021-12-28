@@ -57,6 +57,9 @@ class SportTableViewController: UITableViewController, ImagePickerDelegate, UIIm
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! SportTableViewCell
         cell.sportNameLabel.text = sports[indexPath.row].name
+        if let image = sports[indexPath.row].image {
+        cell.sportImageIV.image = UIImage(data: image )
+        }
         cell.imagePickerDelegate = self
         cell.imageBtn.tag = indexPath.row
         cell.imageBtn.addTarget(self, action: #selector(whichButtonPressed(sender:)), for: .touchUpInside)
@@ -82,6 +85,15 @@ class SportTableViewController: UITableViewController, ImagePickerDelegate, UIIm
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             let cell:SportTableViewCell = tableView.cellForRow(at: IndexPath(row: selectedIndexInt, section: 0)) as! SportTableViewCell
             cell.sportImageIV.image = image
+            
+            let sport = sports[selectedIndexInt]
+            sport.image = image.pngData()
+            do{
+                try sportContext.save()
+                fetchAllSports()
+            }catch{
+                print("Failed to save Image")
+            }
             
         }
 
